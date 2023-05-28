@@ -30,8 +30,11 @@ class LogoutView(viewsets.views.APIView):
     http_method_names = ['get']
     def get(self, request, format=None):
         usertoken = self.request.META.get('HTTP_AUTHORIZATION')
-        token = usertoken.split(' ')[1]
-        token = Token.objects.get(key=token).delete()
+        try:
+            token = usertoken.split(' ')[1]
+            token = Token.objects.get(key=token).delete()
+        except AttributeError as a:
+            print(a)
         return Response(status=status.HTTP_200_OK)
     
 class CreateUserView(viewsets.views.APIView):

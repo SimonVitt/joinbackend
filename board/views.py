@@ -18,7 +18,6 @@ from rest_framework.authtoken.models import Token
 
 # Create your views here.
 class BoardViewSet(viewsets.ModelViewSet):
-    http_method_names = ['get']
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
     authentication_classes = [TokenAuthentication]
@@ -35,14 +34,6 @@ class BoardViewSet(viewsets.ModelViewSet):
             return queryset
         except IndexError as e:
             return []
-    
-
-class CreateBoardViewSet(viewsets.ModelViewSet):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    http_method_names = ['post', 'patch']
-    queryset = Board.objects.all()
-    serializer_class = BoardSerializer
     
     def get_group(self, board_users_list):
         numberOfGroups = Group.objects.filter(name__contains='boardgroup').count()
@@ -69,7 +60,8 @@ class CreateBoardViewSet(viewsets.ModelViewSet):
         for user in board_users_list:
             board.board_users.add(user)
         serialzed_board = serializers.serialize('json',[board])
-        return HttpResponse(serialzed_board, status=status.HTTP_201_CREATED,content_type='application/json')
+        return HttpResponse(serialzed_board, status=status.HTTP_201_CREATED,content_type='application/json')   
+    
     
 class UserViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
@@ -111,6 +103,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return self.queryset
     
 class TaskViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete']
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsBoardgroupMember]
     queryset = Task.objects.all()

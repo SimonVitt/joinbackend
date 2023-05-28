@@ -16,15 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
-from board.views import BoardViewSet, UserViewSet, TaskViewSet, CreateBoardViewSet, CategoryViewSet
+from board.views import BoardViewSet, UserViewSet, TaskViewSet, CategoryViewSet
 
 router = routers.DefaultRouter()
-router.register(r'boards', BoardViewSet)
-router.register(r'alluser', UserViewSet, basename='AllUsers')
-router.register(r'createboard', CreateBoardViewSet, basename='AllUsers')
-router.register(r'(?P<id>[\w-]+)/tasks', TaskViewSet, basename='tasksBoard')
-router.register(r'(?P<id>[\w-]+)/users', UserViewSet, basename='allUsersBoard')
-router.register(r'(?P<id>[\w-]+)/categories', CategoryViewSet, basename='allUsersBoard')
+router.register(r'boards', BoardViewSet, basename='boards')
+router.register(r'users', UserViewSet, basename='allusers')
+router.register(r'boards/(?P<id>[\w-]+)/tasks', TaskViewSet, basename='boardtasks')
+router.register(r'boards/(?P<id>[\w-]+)/users', UserViewSet, basename='boardusers')
+router.register(r'boards/(?P<id>[\w-]+)/categories', CategoryViewSet, basename='boardcategories')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
