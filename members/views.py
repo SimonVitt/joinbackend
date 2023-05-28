@@ -82,7 +82,7 @@ def send_mail_view(request):
             token, created = Token.objects.get_or_create(user=user)
             send_mail(
                 'Rest Password',
-                f'Hello {user.username}, \n please click on the Link to reset the yourpassword :) \n https://join-simon-vitt.de/resetpassword/{token}',
+                f'Hello {user.username}, \n please click on the Link to reset the yourpassword :) \n https://join.simon-vitt.de/resetpassword/{token}',
                 'kontakt@simon-vitt.de',
                 [email],
                 fail_silently=False
