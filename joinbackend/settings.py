@@ -27,14 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    'https://joinbackendanywhere.pythonanywhere.com/',
-    'localhost'
+    'https://joinbackendanywhere.pythonanywhere.com/'
 ]
 
-CORS_ALLOWED_ORIGINS = ["https://join.simon-vitt.de", "https://www.join.simon-vitt.de", "http://localhost:4200"]
+CORS_ALLOWED_ORIGINS = ["https://join.simon-vitt.de", "https://www.join.simon-vitt.de"]
 
 
 # Application definition
