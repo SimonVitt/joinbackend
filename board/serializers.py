@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from .models import Board, Task, Category
 
@@ -21,7 +22,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         
 class BoardSerializer(serializers.HyperlinkedModelSerializer):
     board_users = UserSerializer(many=True)
-    group = GroupSerializer()
+    group = GroupSerializer(required=False)
     class Meta:
         model = Board
         fields = ['name', 'group', 'board_users', 'id']
@@ -32,11 +33,25 @@ class BoardSerializer(serializers.HyperlinkedModelSerializer):
             instance.group.user_set.set(new_board_users)
             instance.board_users.set(new_board_users)
         return super().update(instance, validated_data)
+    
+    def create_group(self, board_users_list):
+        numberOfGroups = Group.objects.filter(name__contains='boardgroup').count()
+        newGroup = Group.objects.get_or_create(name=f"boardgroup{numberOfGroups}")
+        newGroup = newGroup[0]
+        newGroup.user_set.set(board_users_list)
+        return newGroup
+    
+    def create(self, validated_data):
+        board_users = validated_data.pop('board_users', [])
+        group = self.create_group(board_users)
+        board = Board.objects.create(group=group, **validated_data)
+        board.board_users.set(board_users)
+        return board
 
     
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
-    board = serializers.PrimaryKeyRelatedField(queryset=Board.objects.all())
-    id = serializers.IntegerField(required=False) 
+    board = serializers.PrimaryKeyRelatedField(read_only=True)
+    id = serializers.IntegerField(required=False)
     class Meta:
         model = Category
         fields= ['name', 'color', 'board', 'id']
@@ -49,21 +64,26 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         model = Task
         fields = ['title', 'description', 'due_date', 'status', 'category', 'assigned_users', 'priority', 'id']
         
+    def create(self, validated_data):
+        assigned_users_data = validated_data.pop('assigned_users', [])
+        assigned_users = User.objects.filter(id__in=[user.id for user in assigned_users_data])
+        category_data = validated_data.pop('category', None)
+        category = get_object_or_404(Category, id=category_data['id']) if category_data else None
+        board_id = self.context.get('board_id')
+        board = get_object_or_404(Board, id=board_id)
+        task = Task.objects.create(**validated_data, category=category, board=board)
+        task.assigned_users.set(assigned_users)
+        return task
+        
     def update(self, instance, validated_data):
-        assigned_users_data = validated_data.get('assigned_users', None)
-        if(assigned_users_data != None):
-            del validated_data['assigned_users']
-            assigned_users = []
-            for user in assigned_users_data:
-                assigned_users.append(user)
+        assigned_users_data = validated_data.pop('assigned_users', None)
+        if assigned_users_data is not None:
+            assigned_users = User.objects.filter(id__in=[user.id for user in assigned_users_data])
             instance.assigned_users.set(assigned_users)
-        category = validated_data.get('category', None)
-        if(category):
-            del validated_data['category']
-            category_id = category.get('id')
-            if category_id:
-                category = Category.objects.get(id=category_id)
-                instance.category = category
+        category_data = validated_data.pop('category', None)
+        if category_data:
+            category = get_object_or_404(Category, id=category_data['id'])
+            instance.category = category
         return super().update(instance, validated_data)
     
 

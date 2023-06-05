@@ -27,13 +27,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
-    'https://joinbackendanywhere.pythonanywhere.com/'
+    'https://joinbackendanywhere.pythonanywhere.com/',
+    'localhost'
 ]
 
-CORS_ALLOWED_ORIGINS = ["https://join.simon-vitt.de", "https://www.join.simon-vitt.de"]
+CORS_ALLOWED_ORIGINS = ["https://join.simon-vitt.de", "https://www.join.simon-vitt.de", "http://localhost:4200"]
 
 
 # Application definition
@@ -139,8 +140,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ]
 }
 

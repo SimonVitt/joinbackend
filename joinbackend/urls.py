@@ -15,18 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from rest_framework import routers
-from board.views import BoardViewSet, UserViewSet, TaskViewSet, CategoryViewSet
-
-router = routers.DefaultRouter()
-router.register(r'boards', BoardViewSet, basename='boards')
-router.register(r'users', UserViewSet, basename='allusers')
-router.register(r'boards/(?P<id>[\w-]+)/tasks', TaskViewSet, basename='boardtasks')
-router.register(r'boards/(?P<id>[\w-]+)/users', UserViewSet, basename='boardusers')
-router.register(r'boards/(?P<id>[\w-]+)/categories', CategoryViewSet, basename='boardcategories')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
+    path('api/', include('board.urls')),
     path('members/', include('members.urls'))
 ]
